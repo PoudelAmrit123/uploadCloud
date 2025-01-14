@@ -1,101 +1,158 @@
-import Image from "next/image";
+"use client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { CloudUpload, Copy } from "lucide-react";
+import { uploadToS3Action , uploadToApiGatewayAction } from "./action";
+
+import React from "react";
+
+
+
+
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [file, setFile] = React.useState<File | null>(null);
+  const [fileMetadata, setFileMetadata] = React.useState<any>(null);
+  const [uri, setUri] = React.useState<string | null>(null);
+  const [copied, setCopied] = React.useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    setFile(selectedFile || null);
+
+    if (selectedFile) {
+      const fileType = selectedFile.type;
+
+      if (fileType.startsWith("image/")) {
+        // Handle image metadata extraction
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const metadata = {
+              type: "image",
+              name: selectedFile.name,
+              size: selectedFile.size,
+              fileType: selectedFile.type,
+              width: img.width,
+              height: img.height,
+            };
+            setFileMetadata(metadata);
+          };
+          img.src = e.target?.result as string;
+        };
+        reader.readAsDataURL(selectedFile);
+      } else if (fileType.startsWith("video/")) {
+        // Handle video metadata extraction
+        const metadata = {
+          type: "video",
+          name: selectedFile.name,
+          size: selectedFile.size,
+          fileType: selectedFile.type,
+        };
+        setFileMetadata(metadata);
+      } else {
+        alert("Unsupported file type. Please upload an image or video.");
+        setFile(null);
+        setFileMetadata(null);
+      }
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setFile(null);
+
+    // Upload to S3
+    const uploadedUri: any = await uploadToS3Action(formData, fileMetadata);
+    setUri(uploadedUri);
+    console.log('uri' , uri)
+ 
+    //  TODO: temporary function in here 
+
+    // TODO: Metadata including the uri and userID(demo for now ) to uploaded to POST  endpoint of the aws APIGATEWAY triggering lambda funciotn that will store the information in dynamoDb.
+
+        const userID = "6780fe1c98f4bceb384dbc7e"
+        const completeMetada = {
+          ...fileMetadata ,
+          uri ,
+          userID
+        }
+        console.log('complete metadata', completeMetada)
+
+       await uploadToApiGatewayAction(completeMetada)
+
+
+
+  };
+
+  const handleCopyToClipboard = () => {
+    if (uri) {
+      navigator.clipboard.writeText(uri);
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    }
+  };
+
+ 
+
+
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+      <div className="bg-white shadow-lg rounded-lg p-6 max-w-md w-full">
+        <h1 className="text-2xl font-bold mb-2 text-center">Upload and Share</h1>
+        <p className="text-gray-600 text-center mb-6">Upload an image or video file here...</p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <label className="block text-gray-700 font-medium">Select a file</label>
+          <div className="relative">
+            <Input
+              type="file"
+              placeholder="Upload a file"
+              accept=".jpg,.jpeg,.png,.mp4"
+              className="file:bg-gray-200 file:font-medium file:cursor-pointer file:border-none file:rounded-md file:mr-4"
+              onChange={handleFileChange}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+
+          <Button
+            type="submit"
+            disabled={!file}
+            className={`w-full ${
+              !file ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500"
+            }`}
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            <CloudUpload className="mr-2" />
+            {!file ? "Select a file to upload" : "Upload File"}
+          </Button>
+        </form>
+
+        {uri && (
+          <div className="mt-6">
+            <h2 className="text-lg font-bold text-gray-800">Uploaded File Link:</h2>
+            <div className="flex items-center mt-2 bg-gray-100 p-2 rounded-lg border border-gray-300">
+              <p className="text-sm text-gray-600 truncate flex-1">{uri}</p>
+              <Button
+                onClick={handleCopyToClipboard}
+                className="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-1"
+              >
+                <Copy className="mr-1" size={16} />
+                {copied ? "Copied!" : "Copy"}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
