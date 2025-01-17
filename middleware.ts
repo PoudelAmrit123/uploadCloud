@@ -8,6 +8,7 @@ export const config = {
 }
 export async function middleware(req: NextRequest) {
   const session = req.cookies.get("session")?.value;
+  
   console.log('next url ', req.nextUrl.pathname);
   console.log('url', req.url);
 
@@ -22,6 +23,7 @@ export async function middleware(req: NextRequest) {
 
   // If no session, allow the user to proceed without redirection
   if (!session) {
+    console.log('no session find so deleting the userId cookies ')
     const cookiesStore = await cookies();
     cookiesStore.delete("userId");
     return NextResponse.next();
@@ -45,11 +47,11 @@ export async function middleware(req: NextRequest) {
       const response = NextResponse.redirect(new URL("/dashboard", req.url));
 
       // Add `userId` to the response cookies
-      response.cookies.set("userId", userId, {
-        // httpOnly: true,
-        // secure: true,
-        expires: new Date(Date.now() + 10 * 60 * 1000), // Expires in 10 minutes
-      });
+      // response.cookies.set("userId", userId, {
+      //   // httpOnly: true,
+      //   // secure: true,
+      //   expires: new Date(Date.now() + 10 * 60 * 1000), // Expires in 10 minutes
+      // });
 
       return response;
     }
