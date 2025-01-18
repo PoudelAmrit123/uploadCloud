@@ -2,6 +2,7 @@ import axios, { Axios } from "axios";
 import { putObject } from "../../aws/s3/index";
 import ConnectToDatabase from "@/database";
 import { User } from "@/models/user.model";
+// import { deleteSession } from "@/lib/sessions";
 
 export async function uploadToS3Action(formData: any, fileMetadata: any) {
   const file = formData.get("file") as File;
@@ -85,4 +86,11 @@ export async function getUserDetailsAction(userId: string) {
     return;
   }
 }
+}
+
+
+export async function updateUserDetailsAction() {
+  //  await deleteSession()
+   
+
 }

@@ -27,8 +27,9 @@ import {
           Bucket: bucketName,
           Key: keyname,
         });
-  
+      // TODO: THe url is not returing error in some credentials(check )
       const uri =  await  getSignedUrl(s3Client , command , { expiresIn: 3600 })
+
      return uri;
   }
   
@@ -40,7 +41,7 @@ import {
                   new PutObjectCommand({ Bucket: bucketName, Body: fileData, Key: keyName })
                 );
               
-                const uri = getSignedFileUrl(keyName)
+                const uri = await getSignedFileUrl(keyName)
                 return uri;
               
             } catch (error) {

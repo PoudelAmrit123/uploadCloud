@@ -6,7 +6,7 @@ import { uploadToS3Action , uploadToApiGatewayAction } from "../../app/action/in
 
 import React from "react";
 
-export  default function UploadPage(){
+export  default function UploadPage({userid} : any){
 
 const [file, setFile] = React.useState<File | null>(null);
 const [fileMetadata, setFileMetadata] = React.useState<any>(null);
@@ -82,7 +82,7 @@ const handleSubmit = async (event: React.FormEvent) => {
 
   // TODO: Metadata including the uri and userID(demo for now ) to uploaded to POST  endpoint of the aws APIGATEWAY triggering lambda funciotn that will store the information in dynamoDb.
 
-      const userID = "6780fe1c98f4bceb384dbc7e"
+      const userID = userid
       const completeMetada = {
         ...fileMetadata ,
         uri ,

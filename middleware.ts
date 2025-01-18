@@ -22,6 +22,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // If no session, allow the user to proceed without redirection
+  // TODO: moved this logic back to session lib
   if (!session) {
     console.log('no session find so deleting the userId cookies ')
     const cookiesStore = await cookies();

@@ -81,7 +81,7 @@ export default function Home() {
         const userID = "6780fe1c98f4bceb384dbc7e"
         const completeMetada = {
           ...fileMetadata ,
-          uri ,
+          uploadedUri ,
           userID
         }
         console.log('complete metadata', completeMetada)

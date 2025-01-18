@@ -43,6 +43,11 @@ export async function deleteSession() {
     cookieStore.delete('session')
   }
 
+  export async function deleteuserIdSession() {
+    const cookieStore = await cookies()
+    cookieStore.delete('userId')
+  }
+
 
 export async function CreateUserIdSession(userId : any){
 
