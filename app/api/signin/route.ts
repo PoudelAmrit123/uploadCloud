@@ -1,5 +1,5 @@
 import ConnectToDatabase from "@/database";
-import { CreateSession  ,clearSession } from "@/lib/sessions";
+import { CreateSession  ,CreateUserIdSession,clearSession } from "@/lib/sessions";
 import { User } from "@/models/user.model";
 
 import { NextRequest, NextResponse } from "next/server";
@@ -39,7 +39,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
            
     
            await clearSession()
-      await CreateSession(userId)   //Created the cookies 
+           console.log("coming here in login api to create the session from userId ")
+           await CreateSession(userId)   //Created the cookies 
+           console.log("coming here in login api to create the userIdsession from userId ")
+      await CreateUserIdSession(userId)
 
 
 

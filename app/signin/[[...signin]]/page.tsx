@@ -32,7 +32,8 @@ function LoginPage() {
 
     // Calling the login Action
     await loginAction(formData)
- router.push('/dashboard')
+    
+    router.push('/dashboard')
      
 
     

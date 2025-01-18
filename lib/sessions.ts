@@ -49,9 +49,9 @@ export async function CreateUserIdSession(userId : any){
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
   const cookieStore = await cookies()
   cookieStore.set('userId', userId, {
-    httpOnly: true,
+    
     expires: expiresAt,
-    secure: true,
+    
   });
 
 }

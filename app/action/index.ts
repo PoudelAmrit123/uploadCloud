@@ -1,5 +1,7 @@
 import axios, { Axios } from "axios";
 import { putObject } from "../../aws/s3/index";
+import ConnectToDatabase from "@/database";
+import { User } from "@/models/user.model";
 
 export async function uploadToS3Action(formData: any, fileMetadata: any) {
   const file = formData.get("file") as File;
@@ -65,4 +67,22 @@ export async function SignupAction(formData: any) {
   }
 
   // console.log("the singup action is done");
+}
+
+export async function getUserDetailsAction(userId: string) {
+
+  console.log("getUserDetails action page "  , userId)
+  if(userId){
+
+  
+  try {
+    console.log("coming here in unusal fashion")
+     const response =  await axios.post(`/api/dashboard/${userId}` , userId)
+     return response.data
+    // return user
+  } catch (error: any) {
+    console.error("Error in getUserDetailsAction:", error.message);
+    return;
+  }
+}
 }
