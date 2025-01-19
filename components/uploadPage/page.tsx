@@ -12,13 +12,14 @@ const [file, setFile] = React.useState<File | null>(null);
 const [fileMetadata, setFileMetadata] = React.useState<any>(null);
 const [uri, setUri] = React.useState<string | null>(null);
 const [copied, setCopied] = React.useState(false);
+const [error , setError] = React.useState(null)
 
 
 
 
 
 
-
+  {error && <h1>`Error ${error}`</h1>}
 
 const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
   const selectedFile = event.target.files?.[0];
@@ -76,12 +77,16 @@ const handleSubmit = async (event: React.FormEvent) => {
   // Upload to S3
   const uploadedUri: any = await uploadToS3Action(formData, fileMetadata);
   setUri(uploadedUri);
+  // if(uri === null){
+  //   console.log("returing here ")
+  //   return
+  // }
   console.log('uri' , uri)
 
   //  TODO: temporary function in here 
 
   // TODO: Metadata including the uri and userID(demo for now ) to uploaded to POST  endpoint of the aws APIGATEWAY triggering lambda funciotn that will store the information in dynamoDb.
-
+      
       const userID = userid
       const completeMetada = {
         ...fileMetadata ,
@@ -90,7 +95,13 @@ const handleSubmit = async (event: React.FormEvent) => {
       }
       console.log('complete metadata', completeMetada)
 
-     await uploadToApiGatewayAction(completeMetada)
+      await uploadToApiGatewayAction(completeMetada)
+      // if( !userid === null){
+      //   await uploadToApiGatewayAction(completeMetada)
+        
+      // }
+
+       console.log('logged in to save the metadata information')
 
 
 

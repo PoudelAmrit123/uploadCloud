@@ -17,7 +17,7 @@ export async function uploadToS3Action(formData: any, fileMetadata: any) {
   );
 
   const fileNameJson = JSON.stringify(fileMetadata);
-  const fileName = JSON.parse(fileNameJson);
+ 
 
   const uri = await putObject(file, fileMetadata.name);
   return uri;

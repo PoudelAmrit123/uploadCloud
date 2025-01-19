@@ -32,7 +32,7 @@ export default function HeaderComponent() {
           ) : pathname === "/dashboard" ? (
             <>
               {/* Activity Button */}
-              <Link href="/activity">
+              <Link href="/dashboard/activity">
                 <Button
                   className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-all"
                   type="button"
