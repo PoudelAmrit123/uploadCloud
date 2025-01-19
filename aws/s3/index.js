@@ -35,7 +35,12 @@ import {
      return uri;
   }
   
-  export async function putObject(fileData, keyName) {
+
+
+  
+  export async function putObject(fileData, oldkeyName) {
+       {/*  Generating the new name and adding to keyName for uniquenss */}
+       const keyName =  keyName + '-'  + Date.now().toString() ;
       console.log('came here in putObject' , keyName)
            console.log(fileData)
             try {
