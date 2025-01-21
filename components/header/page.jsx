@@ -7,11 +7,15 @@ import { Button } from "../ui/button";
 import axios from "axios";
 import { UploadCloudIcon } from "lucide-react";
 
+const baseURL = process.env.NODE_ENV === "production" 
+? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3001";
+console.log(baseURL)
+
 export default function HeaderComponent() {
   const pathname = usePathname();
   const handleLogoutButton = async ()=>{
     try {
-      const response = await fetch("/api/logout", {
+      const response = await fetch(`${baseURL}/api/logout`, {
         method: "POST",
       });
 
