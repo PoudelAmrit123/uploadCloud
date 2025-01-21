@@ -6,7 +6,7 @@ import { User } from "@/models/user.model";
 
 
         const baseURL = process.env.NODE_ENV === "production" 
-        ? "http://52.66.63.38:3000" : "http://localhost:3000";
+        ? "http://52.66.63.38:3000" : "http://localhost:3001";
 console.log(baseURL)
 
 export async function uploadToS3Action(formData: any, fileMetadata: any) {

@@ -9,7 +9,7 @@ export  async function GET(req : NextRequest , {params} : any ){
   const { id } =  await params;
   
 if(!id){
-  return NextResponse.json({message : "The userId is not present in the request header"}, {status : 200 , statusText : "CHECK"})
+  return NextResponse.json({message : "The userId is not present in the request header"}, {status : 400 , statusText : "CHECK"})
 }
 
 
@@ -18,9 +18,9 @@ if(!id){
     await ConnectToDatabase()
     const user = await User.findById(id);
     if(!user){
-      return NextResponse.json({message : "No user found for the given userId" , user}, {status : 404})
+      return NextResponse.json({message : "No user found for the given userId" }, {status : 404})
     }
-    return NextResponse.json({user} , {status : 200})  
+    return NextResponse.json({ message : "the useris " , user} , {status : 200})  
     
   } catch (error : any) {
     console.log("error message :"  , error.message)

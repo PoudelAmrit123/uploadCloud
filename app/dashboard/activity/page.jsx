@@ -30,6 +30,9 @@ const formatDaysOld = (dateString) => {
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
   return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} old`;
 };
+const baseURL = process.env.NODE_ENV === "production" 
+        ? "http://52.66.63.38:3000" : "http://localhost:3001";
+console.log(baseURL)
 
 function Page() {
   const [username, setUsername] = useState("");
@@ -55,14 +58,14 @@ function Page() {
   useEffect(() => {
     const fetchUserDetail = async () => {
       const response = await fetch(
-        `http://localhost:3000/api/dashboard/${userId}` , 
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          method: "GET",
-          credentials: "include", // Include the cookie in the request
-        }
+        `${baseURL}/api/dashboard/${userId}`  
+        // {
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   method: "GET",
+        //   credentials: "include", // Include the cookie in the request
+        // }
       );
       const data = await response.json();
       setUsername(data.user.name);

@@ -11,6 +11,9 @@ function Page() {
   const router = useRouter();
 
   const userIdInstant = Cookies.get("userId");
+  const baseURL = process.env.NODE_ENV === "production" 
+        ? "http://52.66.63.38:3000" : "http://localhost:3001";
+console.log(baseURL)
 
   useEffect(() => {
     const storedUserId = Cookies.get("userId");
@@ -25,15 +28,15 @@ function Page() {
   React.useEffect(() => {
     const fetchUserDetail = async () => {
       const response = await fetch(
-        `http://localhost:3000/api/dashboard/${userIdInstant}`
+        `${baseURL}/api/dashboard/${userIdInstant}`
         ,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          method: "GET",
-          credentials: "include", // Include the cookie in the request
-        }
+        // {
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   method: "GET",
+        //   credentials: "include", // Include the cookie in the request
+        // }
 
       );
       const data = await response.json();
