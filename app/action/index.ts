@@ -5,8 +5,12 @@ import { User } from "@/models/user.model";
 // import { deleteSession } from "@/lib/sessions";
 
 
+//         const baseURL = process.env.NODE_ENV === "production"  ? "http://52.66.63.38:3000" : "http://localhost:3001";
+// console.log(baseURL)
+
+
         const baseURL = process.env.NODE_ENV === "production" 
-        ? "http://52.66.63.38:3000" : "http://localhost:3001";
+        ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3001";
 console.log(baseURL)
 
 export async function uploadToS3Action(formData: any, fileMetadata: any) {

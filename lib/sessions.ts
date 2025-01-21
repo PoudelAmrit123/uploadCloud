@@ -27,9 +27,11 @@ export async function CreateSession(userId : string){
      const cookieStore = await cookies()
        const  session = await encrypt({userId , expiresAt})
      cookieStore.set('session' , session , {
+        domain : ".matrixcloud.tech",
         httpOnly : true ,
         expires : expiresAt ,
         secure : false,
+        sameSite : "none"
      })
 }
 
