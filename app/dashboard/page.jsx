@@ -26,6 +26,15 @@ function Page() {
     const fetchUserDetail = async () => {
       const response = await fetch(
         `http://localhost:3000/api/dashboard/${userIdInstant}`
+        ,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "GET",
+          credentials: "include", // Include the cookie in the request
+        }
+
       );
       const data = await response.json();
 

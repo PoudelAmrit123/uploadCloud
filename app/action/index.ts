@@ -48,7 +48,9 @@ export async function uploadToApiGatewayAction(fileMetata: any ) {
 
 export async function loginAction(formData: any) {
   try {
-    const response = await axios.post(`${baseURL}/api/signin`, formData);
+    const response = await axios.post(`${baseURL}/api/signin`, formData , {
+      withCredentials : true,
+    });
     // console.log("user action response from axios", response);
     return response;
   } catch (error: any) {
