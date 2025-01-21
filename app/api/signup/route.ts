@@ -2,7 +2,7 @@ import ConnectToDatabase from "@/database";
 import { User } from "@/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   const body: any = await req.json();
   console.log(body )
   console.log(body);
