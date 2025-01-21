@@ -4,6 +4,11 @@ import ConnectToDatabase from "@/database";
 import { User } from "@/models/user.model";
 // import { deleteSession } from "@/lib/sessions";
 
+
+        const baseURL = process.env.NODE_ENV === "production" 
+        ? "http://52.66.63.38:3000" : "http://localhost:3000";
+console.log(baseURL)
+
 export async function uploadToS3Action(formData: any, fileMetadata: any) {
   const file = formData.get("file") as File;
 
@@ -43,7 +48,7 @@ export async function uploadToApiGatewayAction(fileMetata: any ) {
 
 export async function loginAction(formData: any) {
   try {
-    const response = await axios.post("/api/signin", formData);
+    const response = await axios.post(`${baseURL}/api/signin`, formData);
     // console.log("user action response from axios", response);
     return response;
   } catch (error: any) {
@@ -55,7 +60,7 @@ export async function loginAction(formData: any) {
 export async function SignupAction(formData: any) {
 
   try {
-    const response = await axios.post("/api/signup", formData);
+    const response = await axios.post(`${baseURL}/api/signup`, formData);
     // console.log("user action response from axios", response);
     //  return response
   } catch (error: any) {
@@ -74,7 +79,7 @@ export async function getUserDetailsAction(userId: string) {
   
   try {
     console.log("coming here in unusal fashion")
-     const response =  await axios.post(`/api/dashboard/${userId}` , userId)
+     const response =  await axios.post(`${baseURL}/api/dashboard/${userId}` , userId)
      return response.data
     // return user
   } catch (error: any) {
