@@ -3,11 +3,41 @@ import type { NextRequest } from "next/server";
 import { decrypt } from "./lib/sessions";
 import { cookies } from "next/headers";
 
+// CORS setup
+const allowedOrigins = ['https://acme.com', 'https://my-app.org'];
+const corsOptions = {
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher: ['/api/:path*', '/((?!api|_next/static|_next/image|.*\\.png$).*)'],
 };
 
 export async function middleware(req: NextRequest) {
+  // CORS handling for API routes
+  const origin = req.headers.get('origin') ?? '';
+  const isAllowedOrigin = allowedOrigins.includes(origin);
+
+  const isPreflight = req.method === 'OPTIONS';
+  if (isPreflight) {
+    const preflightHeaders = {
+      ...(isAllowedOrigin && { 'Access-Control-Allow-Origin': origin }),
+      ...corsOptions,
+    };
+    return NextResponse.json({}, { headers: preflightHeaders });
+  }
+
+  // Handle simple requests with CORS headers
+  const response = NextResponse.next();
+  if (isAllowedOrigin) {
+    response.headers.set('Access-Control-Allow-Origin', origin);
+  }
+  Object.entries(corsOptions).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
+
+  // Session handling and user authentication
   const session = req.cookies.get("session")?.value;
   console.log('next url ', req.nextUrl.pathname);
   console.log('url', req.url);
@@ -29,8 +59,7 @@ export async function middleware(req: NextRequest) {
       // Redirect logged-in users away from /signin or /signup to /dashboard
       if (
         req.nextUrl.pathname.startsWith("/signin") ||
-        req.nextUrl.pathname.startsWith("/signup") 
-        // req.nextUrl.pathname.startsWith("/") 
+        req.nextUrl.pathname.startsWith("/signup")
       ) {
         return NextResponse.redirect(new URL("/dashboard", req.url));
       }
@@ -50,8 +79,9 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  return response;
 }
+
 
 
  // TODO: Now if the userID exist then create a new respose that will be at /api/dashboard where the userId is passed as the header and from that api we get the userId value and find out all the user information from the local database and also trigger the apigateway of the aws so that lambda funcion will get the userID value and query the request to the mongodb where we have list our metadata along with the file url soted and userId (local). the userId is that we get from the header is used to query the dynamoBD(aws) to find all the informton about  that user upload activity and lambda function returned the resposen throught that api gatwway and we display that informatin on dashboard/myactivity section
