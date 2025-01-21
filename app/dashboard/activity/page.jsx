@@ -55,7 +55,14 @@ function Page() {
   useEffect(() => {
     const fetchUserDetail = async () => {
       const response = await fetch(
-        `http://localhost:3000/api/dashboard/${userId}`
+        `http://localhost:3000/api/dashboard/${userId}` , 
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "GET",
+          credentials: "include", // Include the cookie in the request
+        }
       );
       const data = await response.json();
       setUsername(data.user.name);
