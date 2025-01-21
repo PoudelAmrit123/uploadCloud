@@ -29,7 +29,7 @@ export async function CreateSession(userId : string){
      cookieStore.set('session' , session , {
         httpOnly : true ,
         expires : expiresAt ,
-        secure : true,
+        secure : false,
      })
 }
 
