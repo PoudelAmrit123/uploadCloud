@@ -4,7 +4,7 @@ import { decrypt } from "./lib/sessions";
 import { cookies } from "next/headers";
 
 // CORS setup
-const allowedOrigins = ['https://acme.com', 'https://my-app.org'];
+const allowedOrigins = ['http://52.66.63.38:3000/' , 'http://localhost:3000' , 'http://cloud.matrixcloud.tech:3000/' , 'http://52.66.63.38' ,'http://cloud.matrixcloud.tech' ];
 const corsOptions = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
