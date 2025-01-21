@@ -7,17 +7,13 @@ import { User } from "@/models/user.model";
 export async function uploadToS3Action(formData: any, fileMetadata: any) {
   const file = formData.get("file") as File;
 
-  
-  // console.log(file);
-  // console.log(fileMetadata);
-
   console.log(
     "before upload to s3 action in the same function",
     fileMetadata.name
   );
 
   const fileNameJson = JSON.stringify(fileMetadata);
- 
+  console.log("came just before the putObject fucntion :::::: in the sme function")
 
   const uri = await putObject(file, fileMetadata.name);
   return uri;

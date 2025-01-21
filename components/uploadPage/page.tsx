@@ -64,6 +64,8 @@ export default function UploadPage({ userid }: any) {
     }
   };
 
+  
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -81,13 +83,14 @@ export default function UploadPage({ userid }: any) {
     //   console.log("returing here ")
     //   return
     // }
-    console.log("uri", uri);
+    // console.log("uri", uri);
 
     //  TODO: temporary function in here
 
     // TODO: Metadata including the uri and userID(demo for now ) to uploaded to POST  endpoint of the aws APIGATEWAY triggering lambda funciotn that will store the information in dynamoDb.
 
     const userID = userid;
+  
     const completeMetada = {
       ...fileMetadata,
       uri,

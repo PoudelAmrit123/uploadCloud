@@ -6,7 +6,7 @@ const encodedKey = new TextEncoder().encode(secretKey)
 
 export async function encrypt(payload : any){
 
-   return  new SignJWT(payload).setProtectedHeader({alg : 'HS256'}).setIssuedAt().setExpirationTime('10m')
+   return  new SignJWT(payload).setProtectedHeader({alg : 'HS256'}).setIssuedAt().setExpirationTime('60m')
 .sign(encodedKey)
 
 }
@@ -20,7 +20,7 @@ export async function decrypt(session : any){
 
 
 export async function CreateSession(userId : string){
- const expiresAt = new Date(Date.now() + 10*   60 *1000)
+ const expiresAt = new Date(Date.now() + 60*10*   60 *1000)
 //  const expiresAt = new Date(Date.now() + 7 )
 
  
@@ -51,7 +51,7 @@ export async function deleteSession() {
 
 export async function CreateUserIdSession(userId : any){
 
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  const expiresAt = new Date(Date.now() + 60* 10 * 60 * 1000)
   const cookieStore = await cookies()
   cookieStore.set('userId', userId, {
     

@@ -5,17 +5,36 @@ import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { Button } from "../ui/button";
 import axios from "axios";
+import { UploadCloudIcon } from "lucide-react";
 
 export default function HeaderComponent() {
   const pathname = usePathname();
- 
+  const handleLogoutButton = async ()=>{
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        window.location.href = '/';
+      } else {
+        console.error("Logout failed:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+
+  }
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Application Name */}
         <Link href="/" className="text-2xl font-bold text-blue-600">
-          Uploadhere
+          <div>
+            Uploadnow <UploadCloudIcon className="ml-2 h-6 w-6" />
+          </div>
+          {/* Uploadhere */}
         </Link>
 
         {/* Navigation Buttons */}
@@ -43,23 +62,7 @@ export default function HeaderComponent() {
               {/* Logout Button */}
               <Button
                 className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition-all"
-                onClick={async () => {
-                  try {
-                      await axios.post("/api/logout")
-                    .then( (responce)=>{
-                         console.log(responce.data)
-                        
-                    })
-                    const router = useRouter()
-                    router.push('/')
-                    console.log('from the axios logout ' , responce.ok);
-
-                    
-
-                  } catch (error) {
-                    console.error("Error logging out:", error);
-                  }
-                }}
+                onClick={()=> handleLogoutButton()}
                 type="button"
               >
                 Logout
