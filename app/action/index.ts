@@ -1,21 +1,19 @@
-import axios, { Axios } from "axios";
+// "use server"
+
+import axios from "axios";
 import { putObject } from "../../aws/s3/index";
-import ConnectToDatabase from "@/database";
-import { User } from "@/models/user.model";
-// import { deleteSession } from "@/lib/sessions";
 
-
-//         const baseURL = process.env.NODE_ENV === "production"  ? "http://52.66.63.38:3000" : "http://localhost:3001";
-// console.log(baseURL)
 
 
         const baseURL = process.env.NODE_ENV === "production" 
-        ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3001";
+        ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3000";
 console.log(baseURL)
 
-export async function uploadToS3Action(formData: any, fileMetadata: any) {
-  const file = formData.get("file") as File;
+export async function uploadToS3Action(  formData: any, fileMetadata: any) {
 
+  
+  const file = formData.get("file") as File;
+  console.log('this is what i want' ,file)
   console.log(
     "before upload to s3 action in the same function",
     fileMetadata.name
@@ -25,6 +23,7 @@ export async function uploadToS3Action(formData: any, fileMetadata: any) {
   console.log("came just before the putObject fucntion :::::: in the sme function")
 
   const uri = await putObject(file, fileMetadata.name);
+  console.log('the uri value is ' , uri)
   return uri;
 }
 

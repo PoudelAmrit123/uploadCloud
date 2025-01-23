@@ -31,7 +31,7 @@ const formatDaysOld = (dateString) => {
   return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} old`;
 };
 const baseURL = process.env.NODE_ENV === "production" 
-        ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3001";
+        ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3000";
 console.log(baseURL)
 
 function Page() {

@@ -12,7 +12,7 @@ function Page() {
 
   const userIdInstant = Cookies.get("userId");
   const baseURL = process.env.NODE_ENV === "production" 
-        ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3001";
+        ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3000";
 console.log(baseURL)
 
   useEffect(() => {

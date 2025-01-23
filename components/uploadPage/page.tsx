@@ -73,17 +73,44 @@ export default function UploadPage({ userid }: any) {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("metadata" , fileMetadata.name)
 
     setFile(null);
 
+   
+
     // Upload to S3
-    const uploadedUri: any = await uploadToS3Action(formData, fileMetadata);
-    setUri(uploadedUri);
+
+   try {
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    setUri(data.uri)
+    console.log('the data is from upload page after coming round trip '  , data)
+    console.log('the uri data is from upload page after coming round trip '  , data.uri)
+    
+   } catch (error) {
+    console.error('Error uploading file:', error);
+    return 
+    
+   }
+
+
+
+    //  const uploadedUri: any = await uploadToS3Action(formData, fileMetadata);
+    // setUri(uploadedUri);
     // if(uri === null){
     //   console.log("returing here ")
     //   return
     // }
-    // console.log("uri", uri);
+    console.log("uri", uri);
 
     //  TODO: temporary function in here
 
@@ -96,13 +123,13 @@ export default function UploadPage({ userid }: any) {
       uri,
       userID,
     };
-    console.log("complete metadata", completeMetada);
+    console.log("::::::complete metadata to be store ::::::", completeMetada);
 
-    await uploadToApiGatewayAction(completeMetada);
-    // if( !userid === null){
-    //   await uploadToApiGatewayAction(completeMetada)
+    // await uploadToApiGatewayAction(completeMetada);
+    if( !userid === null){
+      await uploadToApiGatewayAction(completeMetada)
 
-    // }
+    }
 
     console.log("logged in to save the metadata information");
   };
@@ -127,8 +154,8 @@ export default function UploadPage({ userid }: any) {
         <p className="text-gray-600 text-center mb-6">
           Upload an image or video file here...
         </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* encType="multipart/form-data" */}
+        <form onSubmit={handleSubmit}   className="space-y-4">
           <label className="block text-gray-700 font-medium">
             Select a file
           </label>

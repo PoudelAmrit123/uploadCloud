@@ -8,7 +8,7 @@ import axios from "axios";
 import { UploadCloudIcon } from "lucide-react";
 
 const baseURL = process.env.NODE_ENV === "production" 
-? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3001";
+? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3000";
 console.log(baseURL)
 
 export default function HeaderComponent() {
