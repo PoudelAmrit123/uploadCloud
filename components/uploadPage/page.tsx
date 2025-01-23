@@ -11,9 +11,10 @@ import React from "react";
 export default function UploadPage({ userid }: any) {
   const [file, setFile] = React.useState<File | null>(null);
   const [fileMetadata, setFileMetadata] = React.useState<any>(null);
-  const [uri, setUri] = React.useState<string | null>(null);
+  const [uriState, setUriState] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
   const [error, setError] = React.useState(null);
+  // const [keyName, setKeyName] = React.useState<string | null>(null);
 
   {
     error && <h1>`Error ${error}`</h1>;
@@ -71,11 +72,17 @@ export default function UploadPage({ userid }: any) {
 
     if (!file) return;
 
+    
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("metadata" , fileMetadata.name)
+    console.log('::::::::::::::::::::file metadata  name before api call:::::::::::::::::::: ' , fileMetadata.name)
+    formData.append("name" , fileMetadata.name)
 
-    setFile(null);
+    // setFile(null);
+
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
 
    
 
@@ -92,9 +99,34 @@ export default function UploadPage({ userid }: any) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    setUri(data.uri)
-    console.log('the data is from upload page after coming round trip '  , data)
-    console.log('the uri data is from upload page after coming round trip '  , data.uri)
+    const {uri , keyName} = data.data
+    
+    // setKeyName(keyName)
+       console.log('the uri value from the response',uri)
+       console.log('the keyname value from response',keyName)
+
+       const userID = userid;
+       console.log("fileMetadata:", fileMetadata);
+
+  
+       const completeMetada = {
+         ...fileMetadata,
+         uri,
+         userID,
+         keyName,
+       };
+
+       console.log("uri", uriState);
+
+   
+
+   
+    console.log("::::::complete metadata to be store ::::::", completeMetada);
+    setUriState(uri)
+
+    await uploadToApiGatewayAction(completeMetada);
+
+    // TODO: Dispatch the fileMetadata to the redux 
     
    } catch (error) {
     console.error('Error uploading file:', error);
@@ -110,33 +142,15 @@ export default function UploadPage({ userid }: any) {
     //   console.log("returing here ")
     //   return
     // }
-    console.log("uri", uri);
+    
+    
 
-    //  TODO: temporary function in here
-
-    // TODO: Metadata including the uri and userID(demo for now ) to uploaded to POST  endpoint of the aws APIGATEWAY triggering lambda funciotn that will store the information in dynamoDb.
-
-    const userID = userid;
-  
-    const completeMetada = {
-      ...fileMetadata,
-      uri,
-      userID,
-    };
-    console.log("::::::complete metadata to be store ::::::", completeMetada);
-
-    // await uploadToApiGatewayAction(completeMetada);
-    if( !userid === null){
-      await uploadToApiGatewayAction(completeMetada)
-
-    }
-
-    console.log("logged in to save the metadata information");
+    
   };
 
   const handleCopyToClipboard = () => {
-    if (uri) {
-      navigator.clipboard.writeText(uri);
+    if (uriState) {
+      navigator.clipboard.writeText(uriState);
       setCopied(true);
 
       setTimeout(() => {
@@ -181,13 +195,13 @@ export default function UploadPage({ userid }: any) {
           </Button>
         </form>
 
-        {uri && (
+        {uriState && (
           <div className="mt-6">
             <h2 className="text-lg font-bold text-gray-800">
               Uploaded File Link:
             </h2>
             <div className="flex items-center mt-2 bg-gray-100 p-2 rounded-lg border border-gray-300">
-              <p className="text-sm text-gray-600 truncate flex-1">{uri}</p>
+              <p className="text-sm text-gray-600 truncate flex-1">{uriState}</p>
               <Button
                 onClick={handleCopyToClipboard}
                 className="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-1"

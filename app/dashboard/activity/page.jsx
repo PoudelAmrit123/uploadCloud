@@ -10,7 +10,7 @@ import {
   setUserName,
   setFiles,
 } from "@/lib/features/userDetails/userSlice";
-
+import { useDebounce } from "use-debounce";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +22,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { deleteObject, deleteFromDynamoDB } from "@/aws/s3";
+import { revalidateTag } from "next/cache";
 
 const formatDaysOld = (dateString) => {
   const date = new Date(dateString);
@@ -30,9 +32,11 @@ const formatDaysOld = (dateString) => {
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
   return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} old`;
 };
-const baseURL = process.env.NODE_ENV === "production" 
-        ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3000";
-console.log(baseURL)
+const baseURL =
+  process.env.NODE_ENV === "production"
+    ? "http://cloud.matrixcloud.tech:3000"
+    : "http://localhost:3000";
+console.log(baseURL);
 
 function Page() {
   const [username, setUsername] = useState("");
@@ -58,7 +62,7 @@ function Page() {
   useEffect(() => {
     const fetchUserDetail = async () => {
       const response = await fetch(
-        `${baseURL}/api/dashboard/${userId}`  
+        `${baseURL}/api/dashboard/${userId}`
         // {
         //   headers: {
         //     "Content-Type": "application/json",
@@ -75,7 +79,7 @@ function Page() {
     const fetchUserMetadata = async () => {
       setLoading(true);
       const response = await axios.get(
-        `https://u3rwrbvl76.execute-api.ap-south-1.amazonaws.com/dev/download?userID=${userId}`
+        `https://u3rwrbvl76.execute-api.ap-south-1.amazonaws.com/dev/download?userID=${userId}` 
       );
       setFileMetadata(response.data?.body?.response.Items || []);
       setLoading(false);
@@ -86,12 +90,14 @@ function Page() {
   }, [userId]);
 
   // File filter logic
+
+   const [debounceQuery] = useDebounce(searchQuery , 300)
   const filteredFiles = fileMetadata.filter((file) => {
     const fileName = (file?.name?.S || "").toLowerCase();
     const fileType = (file?.file_type?.S || "").toLowerCase();
     return (
-      fileName.includes(searchQuery.toLowerCase()) ||
-      fileType.includes(searchQuery.toLowerCase())
+      fileName.includes(debounceQuery.toLowerCase()) ||
+      fileType.includes(debounceQuery.toLowerCase())
     );
   });
 
@@ -114,10 +120,26 @@ function Page() {
     setShowDialog(true);
   };
 
-  const handleDelete =  async ()=>{
-    console.log("Delete file with ID:" , deleteId)
+  const handleDelete = async () => {
+    console.log("Delete file with ID:", deleteId);
+    console.log("the user id is :", userId);
+    console.log(fileMetadata.file_type);
+    console.log(fileMetadata[0].key_name.S);
+    const keyName = fileMetadata[0].key_name.S;
 
-  }
+    //UserId--> partitions key
+    //deleteId --->file_id sortkey
+    // file_type =---> secondary inddex
+
+         console.log(deleteId , userId)
+
+    await deleteFromDynamoDB(deleteId, userId);
+    console.log("DynamoDB metadata deleted successfully.");
+
+    // TODO: User ID is passed for revalidating the path 
+    await deleteObject(keyName , userId);
+    console.log("S3 object deleted successfully.");
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -213,23 +235,26 @@ function Page() {
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </AlertDialogTrigger>
-                
 
-                <AlertDialogContent >
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      your fileMetada and remove your data from cloud.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel onClick={ ()=> setShowDialog(false)} >Cancel</AlertDialogCancel>
-                    <AlertDialogAction   onClick={handleDelete}>Continue</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete your fileMetada and remove your data from cloud.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel onClick={() => setShowDialog(false)}>
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>
+                        Continue
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
                 </AlertDialog>
               </div>
             </div>
