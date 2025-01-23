@@ -11,12 +11,11 @@ function LoginPage() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const router = useRouter()
-  // const [formData  , setFormDat] = React.useState([])
-
+ 
   const handleSubmit =  async(e: React.FormEvent) => {
     e.preventDefault();
     
-    // Perform your login logic here
+   
 
     const formData = {
       email,
@@ -30,7 +29,6 @@ function LoginPage() {
 
 
 
-    // Calling the login Action
     await loginAction(formData)
     
     router.push('/dashboard')

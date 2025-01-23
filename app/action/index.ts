@@ -54,7 +54,7 @@ export async function loginAction(formData: any) {
     const response = await axios.post(`${baseURL}/api/signin`, formData , {
       withCredentials : true,
     });
-    // console.log("user action response from axios", response);
+    
     return response;
   } catch (error: any) {
     console.error("Error in signinAction:", error.message);

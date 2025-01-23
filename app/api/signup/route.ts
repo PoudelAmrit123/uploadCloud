@@ -14,25 +14,23 @@ export async function POST(req: NextRequest) {
   try {
     await ConnectToDatabase();
 
-    // Check if the email already exists in the database
-    const isUniqueUser = await User.findOne({ email: body.email });
+     const isUniqueUser = await User.findOne({ email: body.email });
     if (isUniqueUser) {
       return NextResponse.json({ message: "User already exists" }, { status: 400 });
     }
 
-    // Create a new user
     const user = new User({
         name: body.name,
         email: body.email,
         password : body.password
     });
-    await user.save(); // Ensure you await the save operation
+    await user.save(); 
 
    
 
     return NextResponse.json({ message: "Signup successful", user }, { status: 200  , statusText : "OK"});
   } catch (error: any) {
-    console.error(error); // Log the error for debugging
+    console.error(error); 
     return NextResponse.json({ message: "Error while creating the user", error: error.message }, { status: 500 });
   }
 }

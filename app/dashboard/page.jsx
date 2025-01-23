@@ -66,7 +66,7 @@ console.log(baseURL)
 
       {/* Centered Upload Page */}
       <div className="flex justify-center mt-8">
-        <div className="w-full max-w-4xl p-0"> {/* Removed the background shade here */}
+        <div className="w-full max-w-4xl p-0"> 
           <UploadPage userid={userId} />
         </div>
       </div>

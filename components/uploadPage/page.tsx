@@ -103,7 +103,7 @@ export default function UploadPage({ userid }: any) {
    }
 
 
-
+            // TODO: Changed the upload logic from server Action to API 
     //  const uploadedUri: any = await uploadToS3Action(formData, fileMetadata);
     // setUri(uploadedUri);
     // if(uri === null){
