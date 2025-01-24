@@ -7,7 +7,7 @@ import {
 } from "@aws-sdk/client-s3";
 // import  '../../envConfig'
 
-import { DynamoDBClient, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
+
 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { revalidatePath } from "next/cache";
@@ -26,14 +26,7 @@ const s3Client = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
-const tableName = "MetadataTable"
-const dbClient = new DynamoDBClient({
-  region: "ap-south-1",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+
 
 export async function getSignedFileUrl(keyname) {
   console.log("came here in getSignedFileUrl");
@@ -110,32 +103,4 @@ export async function deleteObject(keyname , userId) {
     return response;
   }
 }
-export async function deleteFromDynamoDB(file_id, user_id) {
 
-
-  try {
-    const input = {
-      TableName: tableName,
-      Key: {
-        user_id: {
-          S: user_id,
-        },
-        file_id: {
-          S: file_id,
-        },
-      },
-    };
-    
-    const command = new DeleteItemCommand(input);
-    const response = await dbClient.send(command);
-    console.log("Item deleted successfully:", response);
-  
-    return response
-    
-  } catch (error) {
-    console.error("Error deleting item:", error);
-    throw error;
-    
-  }
-
-}

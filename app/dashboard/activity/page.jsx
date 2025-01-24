@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { Image, Video, Edit3, Trash2, Search } from "lucide-react";
+
 import { useSelector, useDispatch } from "react-redux";
 import {
   setUserEmail,
@@ -10,6 +11,7 @@ import {
   setUserName,
   setFiles,
 } from "@/lib/features/userDetails/userSlice";
+
 import { useDebounce } from "use-debounce";
 import {
   AlertDialog,
@@ -22,8 +24,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteObject, deleteFromDynamoDB } from "@/aws/s3";
-import { revalidateTag } from "next/cache";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
+import { deleteObject } from "@/aws/s3";
+
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+// import { revalidateTag } from "next/cache";
+import { deleteFromDynamoDB, updateFromDynamoDB } from "@/aws/dynamoDb";
 
 const formatDaysOld = (dateString) => {
   const date = new Date(dateString);
@@ -45,19 +64,11 @@ function Page() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [editId, setEditId] = useState(null);
+  const [editedValue , setEditedValue] = useState(null)
   const [isDialogOpen, setShowDialog] = useState(false);
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const userId = Cookies.get("userId");
-
-  //  useEffect ( ()=>{
-
-  //    const  fetchFromStore = async ()=>{
-  //     const userDetails = useSelector((state) => state.user);
-  //     console.log(userDetails);
-  //   }
-
-  //   fetchFromStore()
-
-  // }, [])
 
   useEffect(() => {
     const fetchUserDetail = async () => {
@@ -79,7 +90,7 @@ function Page() {
     const fetchUserMetadata = async () => {
       setLoading(true);
       const response = await axios.get(
-        `https://u3rwrbvl76.execute-api.ap-south-1.amazonaws.com/dev/download?userID=${userId}` 
+        `https://u3rwrbvl76.execute-api.ap-south-1.amazonaws.com/dev/download?userID=${userId}`
       );
       setFileMetadata(response.data?.body?.response.Items || []);
       setLoading(false);
@@ -91,7 +102,8 @@ function Page() {
 
   // File filter logic
 
-   const [debounceQuery] = useDebounce(searchQuery , 300)
+  const [debounceQuery] = useDebounce(searchQuery, 300);
+
   const filteredFiles = fileMetadata.filter((file) => {
     const fileName = (file?.name?.S || "").toLowerCase();
     const fileType = (file?.file_type?.S || "").toLowerCase();
@@ -100,6 +112,8 @@ function Page() {
       fileType.includes(debounceQuery.toLowerCase())
     );
   });
+
+ 
 
   if (loading) {
     return <div className="text-center mt-10">Loading The Activity...</div>;
@@ -111,9 +125,69 @@ function Page() {
 
   const handleFileAction = (url, action) => {};
 
-  const handleEdit = (fileId) => {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  const handleEditOnClick = (fileId , fileName) => {
+    setEditId(fileId);
+    setEditedValue(fileName)
+    setEditDialogOpen(true);
+
     console.log("Edit file with ID:", fileId);
+    console.log("Edit file user is ,", userId);
   };
+
+  const handleEditedLogic =  async ()=>{
+    //TODO:call the dynampDb sdk to update the vlaue right 
+
+    const newFileName = editedValue
+    const fileid = editId
+
+          console.log(newFileName)
+          console.log(fileid)
+          console.log(userId)
+
+          
+     const response =  await  updateFromDynamoDB(newFileName , fileid , userId)
+     console.log(response)
+
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const handleDeleteonClick = (fileId) => {
     setDeleteId(fileId);
@@ -131,13 +205,13 @@ function Page() {
     //deleteId --->file_id sortkey
     // file_type =---> secondary inddex
 
-         console.log(deleteId , userId)
+    console.log(deleteId, userId);
 
     await deleteFromDynamoDB(deleteId, userId);
     console.log("DynamoDB metadata deleted successfully.");
 
-    // TODO: User ID is passed for revalidating the path 
-    await deleteObject(keyName , userId);
+    // TODO: User ID is passed for revalidating the path
+    await deleteObject(keyName, userId);
     console.log("S3 object deleted successfully.");
   };
 
@@ -178,7 +252,6 @@ function Page() {
           const fileName = file?.name?.S;
           const fileSize = parseInt(file?.size?.N) / 1024 / 1024;
           const createdAt = formatDaysOld(file?.createdAt?.S);
-
           return (
             <div
               key={index}
@@ -219,12 +292,55 @@ function Page() {
                 >
                   Download
                 </button>
-                <button
-                  onClick={() => handleEdit(file?.file_id?.S)}
-                  className="text-yellow-500 hover:text-yellow-600"
-                >
-                  <Edit3 className="w-5 h-5" />
-                </button>
+
+                {/* Edit Button */}
+
+                <Dialog>
+                  <DialogTrigger asChild>
+
+                    <button
+                      onClick={() => handleEditOnClick(file?.file_id?.S , fileName)}
+                      className="text-yellow-500 hover:text-yellow-600"
+                    >
+                      <Edit3 className="w-5 h-5" />
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle>Edit File Name</DialogTitle>
+                          <DialogDescription>
+                          Make changes to your File name. Click save when you're done.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-right">
+              Name
+            </Label>
+            <Input id="name" value={editedValue}  onChange={ (e)=>  setEditedValue(e.target.value)}className="col-span-3" />
+          </div>          
+
+
+                        <DialogFooter>
+                          <DialogClose>
+                            <Button variant="ghost">Cancel</Button>
+                            
+                    <Button   type="submit"  onClick={handleEditedLogic} >Save changes</Button>
+                          </DialogClose>
+        </DialogFooter>
+
+                      </DialogContent>
+
+
+
+
+
+
+
+
+
+                </Dialog>
+
+                {/* Delete BTn*/}
 
                 <AlertDialog open={isDialogOpen} onOpenChange={setShowDialog}>
                   <AlertDialogTrigger asChild>
