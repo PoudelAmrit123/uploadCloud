@@ -34,12 +34,12 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose
-} from "../../../components/ui/dialog.jsx";
+} from "../../../components/ui/dialog.tsx";
 import { deleteObject } from "@/aws/s3";
 
-import  {Label } from "../../../components/ui/label.jsx";
-import { Input } from "../../../components/ui/input.jsx";
-import { Button } from "../../../components/ui/button.jsx";
+import  {Label } from "../../../components/ui/label.tsx";
+import { Input } from "../../../components/ui/input.tsx";
+import { Button } from "../../../components/ui/button.tsx";
 
 // import { revalidateTag } from "next/cache";
 import { deleteFromDynamoDB, updateFromDynamoDB } from "../../../aws/dynamoDb/index.js";
