@@ -34,15 +34,15 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose
-} from "../../../components/ui/dialog.tsx";
+} from "../../../components/ui/dialog.jsx";
 import { deleteObject } from "@/aws/s3";
 
-import  {Label } from "@/components/ui/label.jsx";
-import { Input } from "@/components/ui/input.jsx";
-import { Button } from "@/components/ui/button.jsx";
+import  {Label } from "../../../components/ui/label.jsx";
+import { Input } from "../../../components/ui/input.jsx";
+import { Button } from "../../../components/ui/button.jsx";
 
 // import { revalidateTag } from "next/cache";
-import { deleteFromDynamoDB, updateFromDynamoDB } from "@/aws/dynamoDb";
+import { deleteFromDynamoDB, updateFromDynamoDB } from "../../../aws/dynamoDb/index.js";
 
 const formatDaysOld = (dateString) => {
   const date = new Date(dateString);
