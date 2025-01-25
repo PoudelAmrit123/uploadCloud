@@ -34,7 +34,7 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose
-} from "@/components/ui/dialog";
+} from "../../../components/ui/dialog";
 import { deleteObject } from "@/aws/s3";
 
 import { Label } from "../../../components/ui/label";
