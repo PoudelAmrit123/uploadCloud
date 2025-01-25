@@ -37,12 +37,12 @@ import {
 } from "@/components/ui/dialog";
 import { deleteObject } from "@/aws/s3";
 
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Label } from "../../../components/ui/label";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
 
 // import { revalidateTag } from "next/cache";
-import { deleteFromDynamoDB, updateFromDynamoDB } from "@/aws/dynamoDb";
+import { deleteFromDynamoDB, updateFromDynamoDB } from "../../../aws/dynamoDb/index";
 
 const formatDaysOld = (dateString) => {
   const date = new Date(dateString);
