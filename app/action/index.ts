@@ -5,9 +5,12 @@ import { putObject } from "../../aws/s3/index";
 
 
 
-        const baseURL = process.env.NODE_ENV === "production" 
-        ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3000";
-console.log(baseURL)
+        // const baseURL = process.env.NODE_ENV === "production" 
+       // // ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3000";
+      //  const baseURL = "http://localhost:3000";
+//console.log('from this ?:::' ,baseURL)
+
+
 
 export async function uploadToS3Action(  formData: any, fileMetadata: any) {
 
@@ -51,7 +54,7 @@ export async function uploadToApiGatewayAction(fileMetata: any ) {
 
 export async function loginAction(formData: any) {
   try {
-    const response = await axios.post(`${baseURL}/api/signin`, formData , {
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/signin`, formData , {
       withCredentials : true,
     });
     
@@ -65,7 +68,7 @@ export async function loginAction(formData: any) {
 export async function SignupAction(formData: any) {
 
   try {
-    const response = await axios.post(`${baseURL}/api/signup`, formData);
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/signup`, formData);
     // console.log("user action response from axios", response);
     //  return response
   } catch (error: any) {
@@ -84,7 +87,7 @@ export async function getUserDetailsAction(userId: string) {
   
   try {
     console.log("coming here in unusal fashion")
-     const response =  await axios.post(`${baseURL}/api/dashboard/${userId}` , userId)
+     const response =  await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/dashboard/${userId}` , userId)
      return response.data
     // return user
   } catch (error: any) {

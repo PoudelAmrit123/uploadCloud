@@ -11,9 +11,13 @@ function Page() {
   const router = useRouter();
 
   const userIdInstant = Cookies.get("userId");
-  const baseURL = process.env.NODE_ENV === "production" 
-        ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3000";
-console.log(baseURL)
+//   const baseURL = process.env.NODE_ENV === "production" 
+ // //         ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3000";
+// console.log(baseURL)
+
+
+  
+      //  const baseURL = "http://localhost:3000";
 
   useEffect(() => {
     const storedUserId = Cookies.get("userId");
@@ -28,7 +32,7 @@ console.log(baseURL)
   React.useEffect(() => {
     const fetchUserDetail = async () => {
       const response = await fetch(
-        `${baseURL}/api/dashboard/${userIdInstant}`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/dashboard/${userIdInstant}`
         ,
         // {
         //   headers: {

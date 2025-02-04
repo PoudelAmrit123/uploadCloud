@@ -5,7 +5,17 @@ import {
   GetObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
-// import  '../../envConfig'
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -36,7 +46,7 @@ export async function getSignedFileUrl(keyname) {
     Key: keyname,
   });
   // TODO: THe url is not returing error in some credentials(check )
-  const uri = await getSignedUrl(s3Client, command);
+  const uri = await getSignedUrl(s3Client, command );
 
   return uri;
 }

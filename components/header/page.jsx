@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { Button } from "../ui/button";
 import axios from "axios";
-import { UploadCloudIcon } from "lucide-react";
+import { TrendingUp, UploadCloudIcon } from "lucide-react";
 
 const baseURL = process.env.NODE_ENV === "production" 
 ? "http://cloud.matrixcloud.tech:3000" : "http://localhost:3000";
@@ -54,6 +54,18 @@ export default function HeaderComponent() {
             </Link>
           ) : pathname === "/dashboard" ? (
             <>
+
+            {/* Explre Page*/ }
+            <Link
+            href="/dashboard/explore"
+            >
+              <Button
+                  className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-all"
+                  type="button"
+                >
+                  <TrendingUp />Explore
+                </Button>
+            </Link>
               {/* Activity Button */}
               <Link href="/dashboard/activity">
                 <Button
@@ -63,6 +75,8 @@ export default function HeaderComponent() {
                   Activity
                 </Button>
               </Link>
+
+              
               {/* Logout Button */}
               <Button
                 className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition-all"

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { Image, Video, Edit3, Trash2, Search } from "lucide-react";
+import { Image, Video, Edit3, Trash2, Search, Heart } from "lucide-react";
 
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -33,17 +33,18 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogClose
+  DialogClose,
 } from "@/components/ui/dialog";
 import { deleteObject } from "@/aws/s3";
 
-import  {Label } from "@/components/ui/label.tsx";
+import { Label } from "@/components/ui/label.tsx";
 
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
 
 // import { revalidateTag } from "next/cache";
 import { deleteFromDynamoDB, updateFromDynamoDB } from "@/aws/dynamoDb";
+import { useRouter } from "next/navigation";
 
 const formatDaysOld = (dateString) => {
   const date = new Date(dateString);
@@ -52,11 +53,13 @@ const formatDaysOld = (dateString) => {
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
   return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} old`;
 };
-const baseURL =
-  process.env.NODE_ENV === "production"
-    ? "http://cloud.matrixcloud.tech:3000"
-    : "http://localhost:3000";
-console.log(baseURL);
+// const baseURL =
+//   process.env.NODE_ENV === "production"
+// //     ? "http://cloud.matrixcloud.tech:3000"
+//     : "http://localhost:3000";
+// console.log(baseURL);
+
+// const baseURL = "http://localhost:3000";
 
 function Page() {
   const [username, setUsername] = useState("");
@@ -66,15 +69,18 @@ function Page() {
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [editId, setEditId] = useState(null);
-  const [editedValue , setEditedValue] = useState(null)
+  const [editedValue, setEditedValue] = useState(null);
   const [isDialogOpen, setShowDialog] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const [postLikesCount, setPostLikesCount] = useState({});
+  const [isPostLikeDialogOpen , setPostLikeDialogOpen]   = useState(false);
   const userId = Cookies.get("userId");
+  const router =useRouter()
 
   useEffect(() => {
     const fetchUserDetail = async () => {
       const response = await fetch(
-        `${baseURL}/api/dashboard/${userId}`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/dashboard/${userId}`
         // {
         //   headers: {
         //     "Content-Type": "application/json",
@@ -94,6 +100,23 @@ function Page() {
         `https://u3rwrbvl76.execute-api.ap-south-1.amazonaws.com/dev/download?userID=${userId}`
       );
       setFileMetadata(response.data?.body?.response.Items || []);
+
+      response.data?.body.response.Items.forEach(async (file) => {
+        const postId = file.file_id.S;
+        const likesResponse = await axios.get("/api/postlikes", {
+          headers: {
+            postID: postId,
+          },
+        });
+        console.log(
+          "the post likes response is ",
+          likesResponse.data.response.Count
+        );
+        setPostLikesCount((prev) => ({
+          ...prev,
+          [postId]: likesResponse.data.response.Count,
+        }));
+      });
       setLoading(false);
     };
 
@@ -114,8 +137,6 @@ function Page() {
     );
   });
 
- 
-
   if (loading) {
     return <div className="text-center mt-10">Loading The Activity...</div>;
   }
@@ -125,70 +146,35 @@ function Page() {
   }
 
   const handleFileAction = (url, action) => {};
+  const handleShowLikes = (fileId) => {
+    console.log("Likes show button clicked");
+    setPostLikeDialogOpen(true)
+    console.log("the like show pop up status is " , isPostLikeDialogOpen)
+  };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  const handleEditOnClick = (fileId , fileName) => {
+  const handleEditOnClick = (fileId, fileName) => {
     setEditId(fileId);
-    setEditedValue(fileName)
+    setEditedValue(fileName);
     setEditDialogOpen(true);
 
     console.log("Edit file with ID:", fileId);
+
     console.log("Edit file user is ,", userId);
   };
 
-  const handleEditedLogic =  async ()=>{
-    //TODO:call the dynampDb sdk to update the vlaue right 
+  const handleEditedLogic = async () => {
+    //TODO:call the dynampDb sdk to update the vlaue right
 
-    const newFileName = editedValue
-    const fileid = editId
+    const newFileName = editedValue;
+    const fileid = editId;
 
-          console.log(newFileName)
-          console.log(fileid)
-          console.log(userId)
+    console.log(newFileName);
+    console.log(fileid);
+    console.log(userId);
 
-          
-     const response =  await  updateFromDynamoDB(newFileName , fileid , userId)
-     console.log(response)
-
-
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    const response = await updateFromDynamoDB(newFileName, fileid, userId);
+    console.log(response);
+  };
 
   const handleDeleteonClick = (fileId) => {
     setDeleteId(fileId);
@@ -216,15 +202,34 @@ function Page() {
     console.log("S3 object deleted successfully.");
   };
 
+  const handleLikeButtonClick = ()=>{
+    console.log("like button clicked")
+    
+    router.push('/dashboard/activity/likes')
+    
+  }
+
   return (
     <div className="container mx-auto p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <div>
+      <div>
           <h1 className="text-2xl font-semibold font-serif">
-            Activity of {username}
+            Activity  of {username}
           </h1>
           <p className="text-sm text-gray-600">Email: {email}</p>
+        </div>
+        <div>
+          
+          <h1 className="text-2xl font-semibold font-serif">
+          {/* <BUtton>Likes</BUtton> */}
+          <Button
+            onClick={handleLikeButtonClick}
+          >Likes</Button>
+           
+          </h1>
+          
+          {/* <p className="text-sm text-gray-600">Email: {email}</p> */}
         </div>
         <p className="text-lg font-thin font-serif">
           Total Files: {fileMetadata?.length}
@@ -253,6 +258,8 @@ function Page() {
           const fileName = file?.name?.S;
           const fileSize = parseInt(file?.size?.N) / 1024 / 1024;
           const createdAt = formatDaysOld(file?.createdAt?.S);
+          const isPublic = file?.is_public?.S;
+          console.log("the type of the file is :::", isPublic);
           return (
             <div
               key={index}
@@ -294,51 +301,68 @@ function Page() {
                   Download
                 </button>
 
+                {/* Likes Section */}
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handleShowLikes(file.file_id.S)}
+                    className="text-purple-500 hover:text-purple-600"
+                  >
+                    <span className="text-sm text-gray-500">
+                      {postLikesCount[file.file_id.S] > 0 ? (
+                        <div>
+                          <Heart className="w-5 h-5 text-red-500 fill-red-500" />{" "}
+                          {postLikesCount[file.file_id.S]}
+                        </div>
+                      ) : null}
+
+                      {/* {postLikesCount[file.file_id.S] || 0} Like  <Heart className="w-5 h-5 text-red-500 fill-red-500" /> */}
+                    </span>
+                  </button>
+                </div>
+
                 {/* Edit Button */}
 
                 <Dialog>
                   <DialogTrigger asChild>
-
                     <button
-                      onClick={() => handleEditOnClick(file?.file_id?.S , fileName)}
+                      onClick={() =>
+                        handleEditOnClick(file?.file_id?.S, fileName)
+                      }
                       className="text-yellow-500 hover:text-yellow-600"
                     >
                       <Edit3 className="w-5 h-5" />
                     </button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>Edit File Name</DialogTitle>
-                          <DialogDescription>
-                          Make changes to your File name. Click save when you're done.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-            <Input id="name" value={editedValue}  onChange={ (e)=>  setEditedValue(e.target.value)}className="col-span-3" />
-          </div>          
+                    <DialogHeader>
+                      <DialogTitle>Edit File Name</DialogTitle>
+                      <DialogDescription>
+                        Make changes to your File name. Click save when you're
+                        done.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">
+                        Name
+                      </Label>
+                      <Input
+                        id="name"
+                        value={editedValue}
+                        onChange={(e) => setEditedValue(e.target.value)}
+                        className="col-span-3"
+                      />
+                    </div>
 
+                    <DialogFooter>
+                      <DialogClose>
+                        <Button variant="ghost">Cancel</Button>
 
-                        <DialogFooter>
-                          <DialogClose>
-                            <Button variant="ghost">Cancel</Button>
-                            
-                    <Button   type="submit"  onClick={handleEditedLogic} >Save changes</Button>
-                          </DialogClose>
-        </DialogFooter>
-
-                      </DialogContent>
-
-
-
-
-
-
-
-
-
+                        <Button type="submit" onClick={handleEditedLogic}>
+                          Save changes
+                        </Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
                 </Dialog>
 
                 {/* Delete BTn*/}
@@ -377,9 +401,30 @@ function Page() {
             </div>
           );
         })}
+
+{isPostLikeDialogOpen && (
+  <Dialog open={isPostLikeDialogOpen} onOpenChange={setPostLikeDialogOpen}>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle> Sorry!!!Work On Progress</DialogTitle>
+      </DialogHeader>
+      <p>Working on Showing the details of the user that liked this post! </p>
+      <DialogFooter>
+        <Button onClick={() => setPostLikeDialogOpen(false)}>OK</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+)}
+
       </div>
     </div>
   );
 }
 
 export default Page;
+
+
+
+
+
+

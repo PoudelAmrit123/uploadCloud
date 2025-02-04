@@ -7,13 +7,17 @@ import {
   uploadToApiGatewayAction,
 } from "../../app/action/index";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 export default function UploadPage({ userid }: any) {
   const [file, setFile] = React.useState<File | null>(null);
   const [fileMetadata, setFileMetadata] = React.useState<any>(null);
   const [uriState, setUriState] = React.useState<string | null>(null);
+  const [visibility, setVisibility] = React.useState("private");
   const [copied, setCopied] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const [showloginPrompt , setShowLoginPrompt] = React.useState(false)
+  const router = useRouter(); 
   // const [keyName, setKeyName] = React.useState<string | null>(null);
 
   {
@@ -65,12 +69,33 @@ export default function UploadPage({ userid }: any) {
     }
   };
 
+
+  const handleLoginRedirect =  ()=>{
+
+    router.push('/signin')
+    setShowLoginPrompt(false)
+    return 
+
+  }
+
+  const handleCancelPrompt = ()=>{
+    setShowLoginPrompt(false)
+    return
+  }
+
   
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!file) return;
+
+    if(visibility === "public" && !userid){
+    
+      // router.push('/signin')
+      setShowLoginPrompt(true);
+      return ;
+    }
 
     
     const formData = new FormData();
@@ -114,6 +139,8 @@ export default function UploadPage({ userid }: any) {
          uri,
          userID,
          keyName,
+         visibility
+
        };
 
        console.log("uri", uriState);
@@ -133,19 +160,14 @@ export default function UploadPage({ userid }: any) {
     return 
     
    }
-
-
-            // TODO: Changed the upload logic from server Action to API 
+   // TODO: Changed the upload logic from server Action to API 
     //  const uploadedUri: any = await uploadToS3Action(formData, fileMetadata);
     // setUri(uploadedUri);
     // if(uri === null){
     //   console.log("returing here ")
     //   return
     // }
-    
-    
-
-    
+   
   };
 
   const handleCopyToClipboard = () => {
@@ -183,6 +205,23 @@ export default function UploadPage({ userid }: any) {
             />
           </div>
 
+
+             { /*DropDown*/}
+
+            <div className="mt-4">
+            <label className="block text-gray-700 font-medium mb-2">
+              Visibility
+            </label>
+            <select
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value)}
+              className="w-full p-2 border rounded-lg bg-gray-50"
+            >
+              <option value="private">Private</option>
+              <option value="public">Public</option>
+            </select>
+          </div>
+
           <Button
             type="submit"
             disabled={!file}
@@ -209,6 +248,31 @@ export default function UploadPage({ userid }: any) {
                 <Copy className="mr-1" size={16} />
                 {copied ? "Copied!" : "Copy"}
               </Button>
+            </div>
+          </div>
+        )}
+
+         {/* Modal for login prompt */}
+
+{showloginPrompt && (
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-md max-w-sm w-full shadow-lg">
+              <h2 className="text-xl font-bold mb-4">Log in to Upload  file Publicly</h2>
+              <p className="text-gray-600 mb-4">You need to be logged in to upload file publicly.</p>
+              <div className="flex justify-between">
+                <Button
+                  onClick={handleLoginRedirect}
+                  className="bg-blue-500 text-white"
+                >
+                  Log in
+                </Button>
+                <Button
+                  onClick={handleCancelPrompt}
+                  className="bg-gray-500 text-white"
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
           </div>
         )}
