@@ -3,7 +3,7 @@ version: "3"
 services:
   app:
    
-    image: amritpoudel/uploadhere:v1
+    image: amritpoudel/uploadhere:v5
     container_name: nextjs-app
     ports:
       - "3000:3000"

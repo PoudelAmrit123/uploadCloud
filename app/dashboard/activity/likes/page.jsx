@@ -26,7 +26,9 @@ function page() {
         fetchUserLikesDetails()} , [] )
   return (
     <>
-    <div>Welcome to the page of  posts that the user likes </div>
+    <div>Welcome To USER LIKE POSTS </div>
+    <div>Working on IT  </div>
+    
     
     </>
   )

@@ -26,46 +26,48 @@ CMD [ "npm" , "start" ]
 # # *}}
 
 
+
+
+
 #   #* {Stage 1 BASE}
-# FROM node:22 AS base
-# WORKDIR /app
-
-# COPY package*.json ./
-
-# RUN npm ci
-
-
-# #* {Stage 2 DEPS}
-# FROM base as deps 
-# COPY . .
-# RUN npm ci 
-
-# #* {Stage 3 BUILD}
-# FROM base AS builder
-# WORKDIR /app
-# COPY . . 
-# COPY --from=deps /app/node_modules /app/node_modules
-# RUN npm run build
+#         FROM node:22 AS base
+#          WORKDIR /app
+       
+#         COPY package*.json ./
+#        RUN npm ci
 
 
-# #* {Stage 4 RUNTIME}
-# FROM gcr.io/distroless/nodejs20 AS runtime
-# WORKDIR /app
+# # #* {Stage 2 DEPS}
+#                            FROM base AS deps 
+#                            COPY . .
+#                            RUN npm ci 
+
+# # #* {Stage 3 BUILD}
+#                         FROM base AS builder
+#                         WORKDIR /app
+#                         COPY . . 
+#                         COPY --from=deps /app/node_modules /app/node_modules
+#                         RUN npm run build
 
 
-# COPY --from=builder /app/public ./public
-# COPY --from=builder /app/.next/standalone ./standalone
-# COPY --from=builder /app/.next/static ./.next/static
+# # #* {Stage 4 RUNTIME}
+#                         FROM gcr.io/distroless/nodejs20 AS runtime
+#                         WORKDIR /app
 
-# # Set environment variables
-# ENV NODE_ENV=production
-# ENV HOSTNAME="0.0.0.0"
-# ENV PORT=3000
 
-# EXPOSE 3000
+#                         COPY --from=builder /app/public ./public
+#                         COPY --from=builder /app/.next/standalone ./standalone
+#                         COPY --from=builder /app/.next/static ./.next/static
 
-# USER 1000  # Run as a non-root user
+#                         # Set environment variables
+#                         # ENV NODE_ENV=production
+#                         # ENV HOSTNAME="0.0.0.0"
+#                         # ENV PORT=3000
 
-# CMD [ "/app/.next/standalone/server.js"]
+#                         EXPOSE 3000
+
+#                         USER 1000  # Run as a non-root user
+
+#                         CMD [ "/app/.next/standalone/server.js"]
 
 # */

@@ -54,6 +54,7 @@ export async function uploadToApiGatewayAction(fileMetata: any ) {
 
 export async function loginAction(formData: any) {
   try {
+    console.log("the env value before the login action is ::::" , process.env.NEXT_PUBLIC_API_BASE_URL)
     const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/signin`, formData , {
       withCredentials : true,
     });
