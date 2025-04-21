@@ -10,8 +10,8 @@ const nextConfig: NextConfig = {
   // }
 
   env : {
-    NEXT_PUBLIC_API_BASE_URL: process.env.NODE_ENV === "production" ?  "https://cloud.matrixcloud.tech/" : "http://localhost:3000" ,
-    MONGO_URI: process.env.NODE_ENV === "production" ? "mongodb://mongo:27017" : "mongodb+srv://username:usernamepassword@cluster0.eh8a7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    NEXT_PUBLIC_API_BASE_URL: process.env.NODE_ENV === "production" ?  "http://upload.matrixcloud.tech/" : "http://localhost:3000" ,
+    MONGO_URI: process.env.NODE_ENV === "production" ? "mongodb://mongo-0.mongo:27017" : "mongodb+srv://username:usernamepassword@cluster0.eh8a7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
 
 
   },
