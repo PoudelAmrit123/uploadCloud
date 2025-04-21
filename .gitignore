@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-/kubernetes
+
 /.pnp
 .pnp.*
 .yarn/*
